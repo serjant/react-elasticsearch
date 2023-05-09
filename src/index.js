@@ -8,6 +8,7 @@ import ActiveFilters from "./ActiveFilters";
 import QueryBuilder from "./QueryBuilder/QueryBuilder";
 import CustomWidget from "./CustomWidget";
 import { fromUrlQueryString, toUrlQueryString, msearch } from "./utils";
+import { useSharedContext } from "./SharedContextProvider";
 
 export {
   Elasticsearch,
@@ -18,6 +19,7 @@ export {
   Listener,
   fromUrlQueryString,
   toUrlQueryString,
+  useSharedContext,
   ActiveFilters,
   QueryBuilder,
   CustomWidget,
