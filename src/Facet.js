@@ -11,12 +11,13 @@ export default function({
   showFilter = true,
   filterValueModifier,
   itemsPerBlock,
-  items
+  items,
+    query
 }) {
   const [{ widgets }, dispatch] = useSharedContext();
   // Current filter (search inside facet value).
   const [filterValue, setFilterValue] = useState("");
-  // Number of itemns displayed in facet.
+  // Number of items displayed in facet.
   const [size, setSize] = useState(itemsPerBlock || 5);
   // The actual selected items in facet.
   const [value, setValue] = useState(initialValue || []);
@@ -34,7 +35,7 @@ export default function({
       needsConfiguration: true,
       isFacet: true,
       wantResults: false,
-      query: { bool: { should: toTermQueries(fields, value) } },
+      query: { bool: { should: query ? query : toTermQueries(fields, value) } },
       value,
       configuration: { size, filterValue, fields, filterValueModifier },
       result: data && total ? { data, total } : null
