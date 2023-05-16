@@ -6,14 +6,14 @@ import qs from "qs";
 export function msearch(url, msearchData, headers = {}) {
   return new Promise(async (resolve, reject) => {
     headers = {
-      ...{ Accept: "application/json", "Content-Type": "application/x-ndjson" },
+      ...{ Accept: "application/json", "Content-Type": "application/json" },
       ...headers
     };
     const body = msearchData.reduce((acc, val) => {
       const [p, q] = [{ preference: val.id }, val.query].map(JSON.stringify);
       return `${acc}${p}\n${q}\n`;
     }, "");
-    const rawResponse = await fetch(`${url}/_msearch`, { method: "POST", headers, body });
+    const rawResponse = await fetch(`${url}/_msearch/`, { method: "POST", headers, body });
     const response = await rawResponse.json();
     resolve(response);
   });
