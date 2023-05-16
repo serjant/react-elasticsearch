@@ -92,7 +92,7 @@ export default function ({children, onChange}) {
                                 function aggFromField(field) {
                                     const t = {
                                         field,
-                                        order: order && orderField ? {[field]: order} : {_count: "desc"},
+                                        order: order && orderField ? {"_key": order} : {_count: "desc"},
                                         size
                                     };
                                     if (filterValue) {
@@ -129,6 +129,9 @@ export default function ({children, onChange}) {
                                                 : i.doc_count,
                                         });
                                     });
+                                    if (order && orderField) {
+                                        return [...map.values()].slice(0, size);
+                                    }
                                     return [...map.values()].sort((x, y) => y.doc_count - x.doc_count).slice(0, size);
                                 },
                                 total: (result) => result.hits.total,
