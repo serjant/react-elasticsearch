@@ -13,7 +13,8 @@ export default function ({
                              itemsPerBlock,
                              items,
                              query,
-                             order
+                             order,
+                             orderField
                          }) {
     const [{widgets}, dispatch] = useSharedContext();
     // Current filter (search inside facet value).
@@ -38,7 +39,7 @@ export default function ({
             wantResults: false,
             query: {bool: {should: query ? query : toTermQueries(fields, value)}},
             value,
-            configuration: {size, filterValue, fields, filterValueModifier, order},
+            configuration: {size, filterValue, fields, filterValueModifier, order, orderField},
             result: data && total ? {data, total} : null
         });
     }, [size, filterValue, value]);

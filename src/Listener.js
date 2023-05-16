@@ -76,6 +76,7 @@ export default function ({children, onChange}) {
                             const filterValue = f.configuration.filterValue;
                             const filterValueModifier = f.configuration.filterValueModifier;
                             const order = f.configuration.order;
+                            const orderField = f.configuration.orderField;
 
                             // Get the aggs (elasticsearch queries) from fields
                             // Dirtiest part, because we build a raw query from various params
@@ -89,7 +90,11 @@ export default function ({children, onChange}) {
 
                                 // Transform a single field to agg query
                                 function aggFromField(field) {
-                                    const t = {field, order: order ? order : {_count: "desc"}, size};
+                                    const t = {
+                                        field,
+                                        order: order && orderField ? {[field]: order} : {_count: "desc"},
+                                        size
+                                    };
                                     if (filterValue) {
                                         t.include = !filterValueModifier
                                             ? `.*${filterValue}.*`
