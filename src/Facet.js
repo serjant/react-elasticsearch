@@ -37,7 +37,7 @@ export default function ({
             needsConfiguration: true,
             isFacet: true,
             wantResults: false,
-            query: {bool: {should: query ? query : toTermQueries(fields, value)}},
+            query: getWidgetQuery(),
             value,
             configuration: {size, filterValue, fields, filterValueModifier, order, orderField},
             result: data && total ? {data, total} : null
@@ -56,6 +56,16 @@ export default function ({
     // Checks if widget value is the same as actual value.
     function isValueReady() {
         return !widgets.get(id) || widgets.get(id).value == value;
+    }
+
+    function getWidgetQuery() {
+        if (query) {
+            if (query.length > 0) {
+                return {bool: {should: query}};
+            }
+        }
+        const termQuery = {bool: {should: toTermQueries(fields, value)}};
+        return termQuery;
     }
 
     // On checkbox status change, add or remove current agg to selected

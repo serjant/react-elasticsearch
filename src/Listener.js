@@ -13,7 +13,8 @@ export default function ({children, onChange}) {
     }
 
     function mapFrom(key) {
-        return new Map([...widgets].filter(([, v]) => v[key]).map(([k, v]) => [k, v[key]]));
+        const keyMap = new Map([...widgets].filter(([, v]) => v[key]).map(([k, v]) => [k, v[key]]));
+        return keyMap;
     }
 
     const configurableWidgets = widgetThat("needsConfiguration");
