@@ -1,7 +1,7 @@
-import React, {useState, useEffect, useCallback} from "react";
+import React, {useState, useEffect, useCallback, useImperativeHandle} from "react";
 import {useSharedContext} from "./SharedContextProvider";
 
-export default function ({customQuery, fields, id, initialValue, placeholder}) {
+const SearchBox = ({customQuery, fields, id, initialValue, placeholder}, ref) => {
     const [{widgets}, dispatch] = useSharedContext();
     const [value, setValue] = useState(initialValue || "");
 
@@ -25,6 +25,12 @@ export default function ({customQuery, fields, id, initialValue, placeholder}) {
         }
         return {match_all: {}};
     }
+
+    useImperativeHandle(ref, () => ({
+        rerender() {
+            update(value);
+        }
+    }));
 
     // This functions updates the current values, then dispatch
     // the new widget properties to context.
@@ -56,7 +62,8 @@ export default function ({customQuery, fields, id, initialValue, placeholder}) {
     const onKeyPress = useCallback(event => {
         if (event.nativeEvent && event.nativeEvent.keyCode == 13) {
             event.preventDefault();
-            event.target.blur()
+            event.target.blur();
+            update(event.target.value);
         }
     });
 
@@ -73,3 +80,5 @@ export default function ({customQuery, fields, id, initialValue, placeholder}) {
         </div>
     );
 }
+
+export default React.forwardRef(SearchBox);
