@@ -13,10 +13,14 @@ export function msearch(url, msearchData, headers = {}) {
             const [p, q] = [{preference: val.id}, val.query].map(JSON.stringify);
             return `${acc}${p}\n${q}\n`;
         }, "");
+        if (window.controller) {
+            window.controller.abort()
+        }
+
         const rawResponse = await fetch(`${url}/_msearch/`, {method: "POST", headers, body});
         const response = await rawResponse.json();
         resolve(response);
-    });
+    }).catch(e => console.log(e));
 }
 
 // Build a query from a Map of queries

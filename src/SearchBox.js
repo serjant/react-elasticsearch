@@ -1,9 +1,10 @@
-import React, {useState, useEffect, useCallback, useImperativeHandle} from "react";
+import React, {useState, useEffect, useCallback, useImperativeHandle, useRef} from "react";
 import {useSharedContext} from "./SharedContextProvider";
 
-const SearchBox = ({customQuery, fields, id, initialValue, placeholder}, ref) => {
+const SearchBox = ({customQuery, fields, id, initialValue, placeholder, isPreventOnChange}, ref) => {
     const [{widgets}, dispatch] = useSharedContext();
     const [value, setValue] = useState(initialValue || "");
+    const inputRef = ref ? ref : useRef(null);
 
     // Update external query on mount.
     useEffect(() => {
@@ -13,7 +14,9 @@ const SearchBox = ({customQuery, fields, id, initialValue, placeholder}, ref) =>
     // If widget value was updated elsewhere (ex: from active filters deletion)
     // We have to update and dispatch the component.
     useEffect(() => {
-        widgets.get(id) && update(widgets.get(id).value);
+        if(!isPreventOnChange) {
+            widgets.get(id) && update(widgets.get(id).value);
+        }
     }, [isValueReady()]);
 
     // Build a query from a value.
@@ -26,7 +29,7 @@ const SearchBox = ({customQuery, fields, id, initialValue, placeholder}, ref) =>
         return {match_all: {}};
     }
 
-    useImperativeHandle(ref, () => ({
+    useImperativeHandle(inputRef, () => ({
         rerender() {
             update(value);
         }
@@ -58,7 +61,6 @@ const SearchBox = ({customQuery, fields, id, initialValue, placeholder}, ref) =>
 
     // Destroy widget from context (remove from the list to unapply its effects)
     useEffect(() => () => dispatch({type: "deleteWidget", key: id}), []);
-
     const onKeyPress = useCallback(event => {
         if (event.nativeEvent && event.nativeEvent.keyCode == 13) {
             event.preventDefault();
@@ -67,16 +69,54 @@ const SearchBox = ({customQuery, fields, id, initialValue, placeholder}, ref) =>
         }
     });
 
+    const onChange = useCallback((event) => {
+        if (isPreventOnChange) {
+            setValue(event.target.value);
+        } else {
+            update(event.target.value)
+        }
+    }, [setValue]);
+
+    const onClickSearchButton = useCallback(_ => {
+        update(value);
+    }, [value]);
+
     return (
-        <div className="react-es-searchbox">
-            <input
-                type="text"
-                value={value}
-                enterKeyHint="search"
-                onKeyPress={onKeyPress}
-                onChange={e => update(e.target.value)}
-                placeholder={placeholder || "search…"}
-            />
+        <div id="site_header_center" style={{display: "block", boxSizing: "border-box", lineHeight: 1.5}}>
+            <div className="main-search-input-block" style={{display: "block", margin: "auto", position: "relative"}}>
+                <span className="search-icon" style={{
+                    height: "38px",
+                    width: "38px",
+                    borderRadius: "100%",
+                    fontSize: "19px",
+                    lineHeight: "35px",
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    overflow: "hidden",
+                    background: "#e12a45",
+                    color: "#fff",
+                    cursor: "pointer",
+                    zIndex: 8
+                }} onClick={onClickSearchButton}></span>
+                <input
+                    style={{
+                        height: "38px",
+                        width: "319px",
+                        border: "1px solid #e12a45",
+                        borderRadius: "19px",
+                        fontSize: "19px",
+                        padding: "14px"
+                    }}
+                    type="text"
+                    ref={inputRef}
+                    defaultValue={value}
+                    enterKeyHint="search"
+                    onKeyPress={onKeyPress}
+                    onChange={onChange}
+                    placeholder={placeholder || "search…"}
+                />
+            </div>
         </div>
     );
 }

@@ -15427,7 +15427,8 @@ var SearchBox = function SearchBox(_ref, ref) {
       fields = _ref.fields,
       id = _ref.id,
       initialValue = _ref.initialValue,
-      placeholder = _ref.placeholder;
+      placeholder = _ref.placeholder,
+      isPreventOnChange = _ref.isPreventOnChange;
 
   var _useSharedContext = Object(_SharedContextProvider__WEBPACK_IMPORTED_MODULE_11__["useSharedContext"])(),
       _useSharedContext2 = _slicedToArray(_useSharedContext, 2),
@@ -15437,8 +15438,9 @@ var SearchBox = function SearchBox(_ref, ref) {
   var _useState = Object(react__WEBPACK_IMPORTED_MODULE_10__["useState"])(initialValue || ""),
       _useState2 = _slicedToArray(_useState, 2),
       value = _useState2[0],
-      setValue = _useState2[1]; // Update external query on mount.
+      setValue = _useState2[1];
 
+  var inputRef = ref ? ref : Object(react__WEBPACK_IMPORTED_MODULE_10__["useRef"])(null); // Update external query on mount.
 
   Object(react__WEBPACK_IMPORTED_MODULE_10__["useEffect"])(function () {
     update(value);
@@ -15446,7 +15448,9 @@ var SearchBox = function SearchBox(_ref, ref) {
   // We have to update and dispatch the component.
 
   Object(react__WEBPACK_IMPORTED_MODULE_10__["useEffect"])(function () {
-    widgets.get(id) && update(widgets.get(id).value);
+    if (!isPreventOnChange) {
+      widgets.get(id) && update(widgets.get(id).value);
+    }
   }, [isValueReady()]); // Build a query from a value.
 
   function queryFromValue(query) {
@@ -15469,7 +15473,7 @@ var SearchBox = function SearchBox(_ref, ref) {
     };
   }
 
-  Object(react__WEBPACK_IMPORTED_MODULE_10__["useImperativeHandle"])(ref, function () {
+  Object(react__WEBPACK_IMPORTED_MODULE_10__["useImperativeHandle"])(inputRef, function () {
     return {
       rerender: function rerender() {
         update(value);
@@ -15516,18 +15520,65 @@ var SearchBox = function SearchBox(_ref, ref) {
       update(event.target.value);
     }
   });
+  var onChange = Object(react__WEBPACK_IMPORTED_MODULE_10__["useCallback"])(function (event) {
+    if (isPreventOnChange) {
+      setValue(event.target.value);
+    } else {
+      update(event.target.value);
+    }
+  }, [setValue]);
+  var onClickSearchButton = Object(react__WEBPACK_IMPORTED_MODULE_10__["useCallback"])(function (_) {
+    update(value);
+  }, [value]);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_10___default.a.createElement("div", {
-    className: "react-es-searchbox"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_10___default.a.createElement("input", {
+    id: "site_header_center",
+    style: {
+      display: "block",
+      boxSizing: "border-box",
+      lineHeight: 1.5
+    }
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_10___default.a.createElement("div", {
+    className: "main-search-input-block",
+    style: {
+      display: "block",
+      margin: "auto",
+      position: "relative"
+    }
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_10___default.a.createElement("span", {
+    className: "search-icon",
+    style: {
+      height: "38px",
+      width: "38px",
+      borderRadius: "100%",
+      fontSize: "19px",
+      lineHeight: "35px",
+      position: "absolute",
+      left: 0,
+      top: 0,
+      overflow: "hidden",
+      background: "#e12a45",
+      color: "#fff",
+      cursor: "pointer",
+      zIndex: 8
+    },
+    onClick: onClickSearchButton
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_10___default.a.createElement("input", {
+    style: {
+      height: "38px",
+      width: "319px",
+      border: "1px solid #e12a45",
+      borderRadius: "19px",
+      fontSize: "19px",
+      padding: "14px"
+    },
     type: "text",
-    value: value,
+    ref: inputRef,
+    defaultValue: value,
     enterKeyHint: "search",
     onKeyPress: onKeyPress,
-    onChange: function onChange(e) {
-      return update(e.target.value);
-    },
+    onChange: onChange,
     placeholder: placeholder || "search…"
-  }));
+  })));
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (/*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_10___default.a.forwardRef(SearchBox));
@@ -15819,23 +15870,28 @@ function msearch(url, msearchData) {
 
                 return "".concat(acc).concat(p, "\n").concat(q, "\n");
               }, "");
-              _context.next = 4;
+
+              if (window.controller) {
+                window.controller.abort();
+              }
+
+              _context.next = 5;
               return Object(unfetch__WEBPACK_IMPORTED_MODULE_39__["default"])("".concat(url, "/_msearch/"), {
                 method: "POST",
                 headers: headers,
                 body: body
               });
 
-            case 4:
+            case 5:
               rawResponse = _context.sent;
-              _context.next = 7;
+              _context.next = 8;
               return rawResponse.json();
 
-            case 7:
+            case 8:
               response = _context.sent;
               resolve(response);
 
-            case 9:
+            case 10:
             case "end":
               return _context.stop();
           }
@@ -15846,7 +15902,9 @@ function msearch(url, msearchData) {
     return function (_x, _x2) {
       return _ref.apply(this, arguments);
     };
-  }());
+  }()).catch(function (e) {
+    return console.log(e);
+  });
 } // Build a query from a Map of queries
 
 function queryFrom(queries) {
