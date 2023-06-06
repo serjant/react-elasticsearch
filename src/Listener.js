@@ -59,6 +59,7 @@ export default function ({children, onChange}) {
                             const {itemsPerPage, page, sort} = r.configuration;
                             msearchData.push({
                                 query: {
+                                    track_total_hits: true,
                                     query: queryFrom(queries),
                                     size: itemsPerPage,
                                     from: (page - 1) * itemsPerPage,

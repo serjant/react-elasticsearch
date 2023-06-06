@@ -14145,6 +14145,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
                   sort = _r$configuration.sort;
               msearchData.push({
                 query: {
+                  track_total_hits: true,
                   query: Object(_utils__WEBPACK_IMPORTED_MODULE_38__["queryFrom"])(queries),
                   size: itemsPerPage,
                   from: (page - 1) * itemsPerPage,
