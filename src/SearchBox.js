@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useCallback, useImperativeHandle, useRef} from "react";
 import {useSharedContext} from "./SharedContextProvider";
 
-const SearchBox = ({customQuery, fields, id, initialValue, placeholder, isPreventOnChange}, ref) => {
+const SearchBox = ({customQuery, fields, id, initialValue, placeholder, isPreventOnChange, onSearchExecute}, ref) => {
     const [{widgets}, dispatch] = useSharedContext();
     const [value, setValue] = useState(initialValue || "");
     const inputRef = ref ? ref : useRef(null);
@@ -14,7 +14,7 @@ const SearchBox = ({customQuery, fields, id, initialValue, placeholder, isPreven
     // If widget value was updated elsewhere (ex: from active filters deletion)
     // We have to update and dispatch the component.
     useEffect(() => {
-        if(!isPreventOnChange) {
+        if (!isPreventOnChange) {
             widgets.get(id) && update(widgets.get(id).value);
         }
     }, [isValueReady()]);
@@ -65,7 +65,11 @@ const SearchBox = ({customQuery, fields, id, initialValue, placeholder, isPreven
         if (event.nativeEvent && event.nativeEvent.keyCode == 13) {
             event.preventDefault();
             event.target.blur();
-            update(event.target.value);
+            if (onSearchExecute) {
+                onSearchExecute(event.target.value);
+            } else {
+                update(event.target.value);
+            }
         }
     });
 
@@ -73,17 +77,32 @@ const SearchBox = ({customQuery, fields, id, initialValue, placeholder, isPreven
         if (isPreventOnChange) {
             setValue(event.target.value);
         } else {
-            update(event.target.value)
+            if (onSearchExecute) {
+                onSearchExecute(event.target.value);
+            } else {
+                update(event.target.value);
+            }
         }
     }, [setValue]);
 
     const onClickSearchButton = useCallback(_ => {
-        update(value);
+        if (onSearchExecute) {
+            onSearchExecute(value);
+        } else {
+            update(value);
+        }
     }, [value]);
 
     return (
-        <div id="site_header_center" style={{display: "block", boxSizing: "border-box", lineHeight: 1.5}}>
-            <div className="main-search-input-block" style={{display: "block", margin: "auto", position: "relative"}}>
+        <div id="site_header_center" style={{
+            display: "flex",
+            boxSizing: "border-box",
+            lineHeight: 1.5,
+            justifyContent: "center",
+            width: "100%"
+        }}>
+            <div className="main-search-input-block"
+                 style={{display: "flex", margin: "auto", position: "relative", justifyContent: "center"}}>
                 <span className="search-icon" style={{
                     height: "38px",
                     width: "38px",

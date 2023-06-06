@@ -15428,7 +15428,8 @@ var SearchBox = function SearchBox(_ref, ref) {
       id = _ref.id,
       initialValue = _ref.initialValue,
       placeholder = _ref.placeholder,
-      isPreventOnChange = _ref.isPreventOnChange;
+      isPreventOnChange = _ref.isPreventOnChange,
+      onSearchExecute = _ref.onSearchExecute;
 
   var _useSharedContext = Object(_SharedContextProvider__WEBPACK_IMPORTED_MODULE_11__["useSharedContext"])(),
       _useSharedContext2 = _slicedToArray(_useSharedContext, 2),
@@ -15517,32 +15518,48 @@ var SearchBox = function SearchBox(_ref, ref) {
     if (event.nativeEvent && event.nativeEvent.keyCode == 13) {
       event.preventDefault();
       event.target.blur();
-      update(event.target.value);
+
+      if (onSearchExecute) {
+        onSearchExecute(event.target.value);
+      } else {
+        update(event.target.value);
+      }
     }
   });
   var onChange = Object(react__WEBPACK_IMPORTED_MODULE_10__["useCallback"])(function (event) {
     if (isPreventOnChange) {
       setValue(event.target.value);
     } else {
-      update(event.target.value);
+      if (onSearchExecute) {
+        onSearchExecute(event.target.value);
+      } else {
+        update(event.target.value);
+      }
     }
   }, [setValue]);
   var onClickSearchButton = Object(react__WEBPACK_IMPORTED_MODULE_10__["useCallback"])(function (_) {
-    update(value);
+    if (onSearchExecute) {
+      onSearchExecute(value);
+    } else {
+      update(value);
+    }
   }, [value]);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_10___default.a.createElement("div", {
     id: "site_header_center",
     style: {
-      display: "block",
+      display: "flex",
       boxSizing: "border-box",
-      lineHeight: 1.5
+      lineHeight: 1.5,
+      justifyContent: "center",
+      width: "100%"
     }
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_10___default.a.createElement("div", {
     className: "main-search-input-block",
     style: {
-      display: "block",
+      display: "flex",
       margin: "auto",
-      position: "relative"
+      position: "relative",
+      justifyContent: "center"
     }
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_10___default.a.createElement("span", {
     className: "search-icon",
